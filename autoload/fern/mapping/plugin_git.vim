@@ -26,9 +26,13 @@ function! s:map_stage(helper) abort
     throw printf("plugin-git-stage action requires 'file' scheme")
   endif
   let root = a:helper.sync.get_root_node()
-  let node = a:helper.sync.get_cursor_node()
+  let nodes = a:helper.sync.get_selected_nodes()
+  let nodes = empty(nodes) ? [a:helper.sync.get_cursor_node()] : nodes
+  let paths = map(copy(nodes), { -> v:val._path })
 
-  call s:Process.start(['git', '-C', root._path, 'add', '--ignore-errors', '--', node._path])
+  call s:Process.start(['git', '-C', root._path, 'add', '--ignore-errors', '--'] + paths)
+        \.then({ -> a:helper.async.update_marks([]) })
+        \.then({ -> a:helper.async.redraw() })
         \.then({ -> fern#hook#emit('plugin:git:update', a:helper) })
 endfunction
 
@@ -37,9 +41,13 @@ function! s:map_unstage(helper) abort
     throw printf("plugin-git-unstage action requires 'file' scheme")
   endif
   let root = a:helper.sync.get_root_node()
-  let node = a:helper.sync.get_cursor_node()
+  let nodes = a:helper.sync.get_selected_nodes()
+  let nodes = empty(nodes) ? [a:helper.sync.get_cursor_node()] : nodes
+  let paths = map(copy(nodes), { -> v:val._path })
 
-  call s:Process.start(['git', '-C', root._path, 'reset', '--quiet', '--', node._path])
+  call s:Process.start(['git', '-C', root._path, 'reset', '--quiet', '--'] + paths)
+        \.then({ -> a:helper.async.update_marks([]) })
+        \.then({ -> a:helper.async.redraw() })
         \.then({ -> fern#hook#emit('plugin:git:update', a:helper) })
 endfunction
 
