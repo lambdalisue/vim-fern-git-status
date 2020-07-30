@@ -28,7 +28,7 @@ let s:parse_status_index_map = {
       \ 'C': 'Renamed',
       \}
 
-function! fern#plugin#git#status#read(root, token) abort
+function! fern_git#status#read(root, token) abort
   let t = s:git(['rev-parse', '--show-toplevel'], a:root, a:token)
         \.then({ v -> join(v.stdout, '') })
   let s = s:git(['status', '--porcelain', '-uall'], a:root, a:token)
