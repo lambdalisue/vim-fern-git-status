@@ -22,6 +22,7 @@ function! s:update(helper) abort
 
   call fern#plugin#git#status#read(a:helper.fern.root._path, s:source.token)
         \.then({ m -> s:update_nodes(a:helper, m) })
+        \.catch({ e -> s:echoerr(m) })
 endfunction
 
 function! s:update_nodes(helper, status_map) abort
@@ -37,6 +38,12 @@ function! s:update_nodes(helper, status_map) abort
         \ v[0],
         \ bufnr,
         \))})
+endfunction
+
+function! s:echoerr(e) abort
+  echohl ErrorMsg
+  echomsg printf('[fern-plugin-git] %s', a:e)
+  echohl None
 endfunction
 
 function! s:signs() abort
