@@ -62,7 +62,7 @@ function! s:syntax(...) abort
   for [k, v] in items(g:fern_git#grantor#badge_map)
     if !empty(v)
       execute printf(
-            \ 'syntax match FernGit%s /%s/ containedin=FernBadge',
+            \ 'syntax match FernGit%s /%s/ contained containedin=FernBadge',
             \ k, escape(v, s:PATTERN),
             \)
     endif
