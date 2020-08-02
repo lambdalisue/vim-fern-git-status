@@ -23,8 +23,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-        with:
-          path: repo
       - uses: actions/checkout@v2
         with:
           repository: lambdalisue/fern.vim
@@ -47,4 +45,4 @@ jobs:
           # https://github.community/t5/GitHub-Actions/TEMP-is-broken-on-Windows/m-p/30432#M427
           TMP: 'C:\Users\runneradmin\AppData\Local\Temp'
         run: |
-          (cd repo; ../vim-themis/bin/themis --runtimepath ../fern.vim)
+          ./vim-themis/bin/themis --runtimepath ./fern.vim ./test
