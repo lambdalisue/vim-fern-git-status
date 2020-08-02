@@ -45,7 +45,7 @@ Describe fern_git_status#parser
               \ ['root/a/a/unmerged', 'Unmerged'],
               \ ['root/a/unmerged', 'Unmerged'],
               \ ['root/ignored', 'Ignored'],
-              \ ['root/index', 'Stained'],
+              \ ['root/index', 'Cleaned'],
               \ ['root/index/copied', 'Staged'],
               \ ['root/index/deleted', 'Deleted'],
               \ ['root/index/modified', 'Staged'],

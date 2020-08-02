@@ -27,6 +27,7 @@ endfunction
 
 function! fern_git_status#on_highlight(...) abort
   highlight default link FernGitStained   WarningMsg
+  highlight default link FernGitCleaned   Special
   highlight default link FernGitStaged    Special
   highlight default link FernGitRenamed   Title
   highlight default link FernGitDeleted   Title
@@ -104,6 +105,7 @@ let g:fern_git_status#disable_ignored = get(g:, 'fern_git_status#disable_ignored
 let g:fern_git_status#disable_stained = get(g:, 'fern_git_status#disable_stained', 0)
 let g:fern_git_status#badge_map = get(g:, 'fern_git_status#badge_map', {
       \ 'Stained': '"',
+      \ 'Cleaned': "'",
       \ 'Staged': '+',
       \ 'Renamed': 'r',
       \ 'Deleted': 'x',

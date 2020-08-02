@@ -53,6 +53,9 @@ Users can customize symbols by |g:fern_git_status#badge_map|.
 =============================================================================
 STATUS					*fern-git-status-status*
 
+"Cleaned"	A directory status which indicate that the directory contains
+		only staged files
+
 "Stained"	A directory status which indicate that the directory contains
 		modified files (Ignored/Unknown is not assumed.)
 
@@ -85,6 +88,7 @@ VARIABLE				*fern-git-status-variable*
 	Default: See below
 >
 	let g:fern_git_status#badge_map = {
+	      \ 'Cleaned': "'",
 	      \ 'Stained': '"',
 	      \ 'Staged': '+',
 	      \ 'Renamed': 'r',

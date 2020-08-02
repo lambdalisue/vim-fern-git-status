@@ -20,12 +20,14 @@ let s:parse_status_index_map = {
       \ 'R': 'Renamed',
       \ 'C': 'Staged',
       \}
-let s:stained_map = {
-      \ 'Unmerged': 1,
-      \ 'Modified': 1,
-      \ 'Deleted': 1,
-      \ 'Renamed': 1,
+let s:cleaned_map = {
       \ 'Staged': 1,
+      \ 'Renamed': 1,
+      \ 'Deleted': 1,
+      \}
+let s:stained_map = {
+      \ 'Modified': 1,
+      \ 'Unmerged': 1,
       \ 'Untracked': 1,
       \}
 
@@ -63,15 +65,27 @@ function! s:parse_status(code) abort
 endfunction
 
 function! s:complete_directory_status(root, status_map) abort
-  for [k, v] in items(a:status_map)
+  let cmap = copy(a:status_map)
+  let smap = copy(a:status_map)
+  for [k, v] in items(cmap)
+    if get(s:cleaned_map, v) isnot# 1
+      continue
+    endif
+    let path = fnamemodify(k, ':h')
+    while path !=# a:root && !has_key(cmap, path)
+      let cmap[path] = 'Cleaned'
+      let path = fnamemodify(path, ':h')
+    endwhile
+  endfor
+  for [k, v] in items(smap)
     if get(s:stained_map, v) isnot# 1
       continue
     endif
     let path = fnamemodify(k, ':h')
-    while path !=# a:root && !has_key(a:status_map, path)
-      let a:status_map[path] = 'Stained'
+    while path !=# a:root && !has_key(smap, path)
+      let smap[path] = 'Stained'
       let path = fnamemodify(path, ':h')
     endwhile
   endfor
-  return a:status_map
+  return extend(cmap, smap)
 endfunction
