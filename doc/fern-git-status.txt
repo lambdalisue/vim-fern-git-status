@@ -1,0 +1,113 @@
+*fern-git-status.txt*	Add Git status badge on fern.vim
+
+=============================================================================
+CONTENTS				*fern-git-status-contents*
+
+INTRODUCTION			|fern-git-status-introduction|
+USAGE				|fern-git-status-usage|
+INTERFACE			|fern-git-status-interface|
+  VARIABLE			|fern-git-status-variable|
+
+
+=============================================================================
+INTRODUCTION				*fern-git-status-introduction*
+
+*fern-git-status.vim* is a |fern.vim| plugin which add Git status badge.
+
+
+=============================================================================
+USAGE					*fern-git-status-usage*
+
+Move on to a git repository which has some dirty status then you will see
+badges on each filenames like:
+>
+	fern-git-status.vim 
+	|- autoload 
+ 	|- fern_git_status 
+  	|  parser.vim 
+ 	|  fern_git_status.vim 
+	|- doc "
+ 	|  fern-git-status.txt ?
+	|+ plugin 
+	|- test 
+ 	|+ fern_git_status 
+	|  LICENSE ?
+	|  README.md *
+<
+In default, each badge symbols mean:
+
+	Symbol		Description~
+	"		Stained directory (a directory which contains changes)
+	+		Staged file
+	r		Renamed file
+	x		Deleted file
+	*		Modified file
+	u		Unmerged file
+	?		Untracked file
+	!		Ignored file
+	U		Unknown status file
+
+Users can customize symbols by |g:fern_git_status#badge_map|.
+
+
+=============================================================================
+STATUS					*fern-git-status-status*
+
+"Stained"	A directory status which indicate that the directory contains
+		modified files (Ignored/Unknown is not assumed.)
+
+"Staged"	A file which changes has staged on the index.
+
+"Renamed"	A file which has renamed on the index
+
+"Deleted"	A file which has deleted on the index
+
+"Modified"	A file which has non staged changes
+
+"Unmerged"	A file which has in conflicted status
+
+"Untracked"	A file which has not tracked
+
+"Ignored"	A file which has ignored
+
+"Unknown"	A file which has unknown status (non supported status)
+
+
+=============================================================================
+INTERFACE				*fern-git-status-interface*
+
+-----------------------------------------------------------------------------
+VARIABLE				*fern-git-status-variable*
+
+*g:fern_git_status#badge_map*
+	A |Dictionary| which key is a |fern-git-status-status| and value is a
+	glyph |String|.
+	Default: See below
+>
+	let g:fern_git_status#badge_map = {
+	      \ 'Stained': '"',
+	      \ 'Staged': '+',
+	      \ 'Renamed': 'r',
+	      \ 'Deleted': 'x',
+	      \ 'Modified': '*',
+	      \ 'Unmerged': 'u',
+	      \ 'Untracked': '?',
+	      \ 'Ignored': '!',
+	      \ 'Unknown': 'U',
+	      \}
+<
+*g:fern_git_status#disable_untracked*
+	Set 1 to disable showing untracked file status.
+	Default: 0
+
+*g:fern_git_status#disable_ignored*
+	Set 1 to disable showing ignored file status.
+	Default: 0
+
+*g:fern_git_status#disable_stained*
+	Set 1 to disable showing stained directory status.
+	Default: 0
+
+
+=============================================================================
+vim:tw=78:fo=tcq2mM:ts=8:ft=help:norl

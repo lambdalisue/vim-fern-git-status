@@ -13,18 +13,12 @@ let s:parse_status_code_map = {
       \ '??': 'Untracked',
       \ '!!': 'Ignored',
       \}
-let s:parse_status_worktree_map = {
-      \ 'M': 'Modified',
-      \ 'D': 'Deleted',
-      \ 'R': 'Renamed',
-      \ 'C': 'Renamed',
-      \}
 let s:parse_status_index_map = {
       \ 'M': 'Staged',
+      \ 'A': 'Staged',
       \ 'D': 'Deleted',
       \ 'R': 'Renamed',
-      \ 'C': 'Renamed',
-      \ 'A': 'Staged',
+      \ 'C': 'Staged',
       \}
 let s:stained_map = {
       \ 'Unmerged': 1,
@@ -48,19 +42,18 @@ function! fern_git_status#parser#parse(root, records, enable_stained) abort
 endfunction
 
 function! s:parse_record(root, record) abort
-  let s = s:parse_status_code(a:record[:1])
+  let s = s:parse_status(a:record[:1])
   let p = matchstr(a:record[3:], '\%(.* -> \)\?\zs.*$')
   return [a:root . '/' . p, s]
 endfunction
 
-function! s:parse_status_code(code) abort
+function! s:parse_status(code) abort
   let s = get(s:parse_status_code_map, a:code)
   if s !=# ''
     return s
   endif
-  let s = get(s:parse_status_worktree_map, a:code[1])
-  if s !=# ''
-    return s
+  if a:code[1] !=# ' '
+    return 'Modified'
   endif
   let s = get(s:parse_status_index_map, a:code[0])
   if s !=# ''

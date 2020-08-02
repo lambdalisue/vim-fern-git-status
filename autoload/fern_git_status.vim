@@ -26,15 +26,15 @@ function! fern_git_status#on_redraw(helper) abort
 endfunction
 
 function! fern_git_status#on_highlight(...) abort
-  highlight default link FernGitDeleted   Title
-  highlight default link FernGitIgnored   Comment
-  highlight default link FernGitModified  WarningMsg
-  highlight default link FernGitRenamed   Title
+  highlight default link FernGitStained   WarningMsg
   highlight default link FernGitStaged    Special
-  highlight default link FernGitUnknown   Comment
+  highlight default link FernGitRenamed   Title
+  highlight default link FernGitDeleted   Title
+  highlight default link FernGitModified  WarningMsg
   highlight default link FernGitUnmerged  WarningMsg
   highlight default link FernGitUntracked Comment
-  highlight default link FernGitStained   WarningMsg
+  highlight default link FernGitIgnored   Comment
+  highlight default link FernGitUnknown   Comment
 endfunction
 
 function! fern_git_status#on_syntax(...) abort
@@ -103,13 +103,13 @@ let g:fern_git_status#disable_untracked = get(g:, 'fern_git_status#disable_untra
 let g:fern_git_status#disable_ignored = get(g:, 'fern_git_status#disable_ignored', 0)
 let g:fern_git_status#disable_stained = get(g:, 'fern_git_status#disable_stained', 0)
 let g:fern_git_status#badge_map = get(g:, 'fern_git_status#badge_map', {
-      \ 'Deleted': 'x',
-      \ 'Ignored': '!',
-      \ 'Modified': '*',
-      \ 'Renamed': 'r',
-      \ 'Staged': '+',
       \ 'Stained': '"',
-      \ 'Unknown': 'U',
+      \ 'Staged': '+',
+      \ 'Renamed': 'r',
+      \ 'Deleted': 'x',
+      \ 'Modified': '*',
       \ 'Unmerged': 'u',
       \ 'Untracked': '?',
+      \ 'Ignored': '!',
+      \ 'Unknown': 'U',
       \})
