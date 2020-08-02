@@ -89,6 +89,8 @@ endfunction
 function! s:echoerr(error) abort
   if a:error ==# s:CancellationToken.CancelledError
     return
+  elseif a:error =~# '^fatal: not a git repository'
+    return
   endif
   echohl ErrorMsg
   for line in split(a:error, '\n')
