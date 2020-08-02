@@ -7,9 +7,9 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Doc](https://img.shields.io/badge/doc-%3Ah%20fern--git--status-orange.svg)](doc/fern-git-status.txt)
 
-[![reviewdog](https://github.com/lambdalisue/fern.vim/workflows/reviewdog/badge.svg)](https://github.com/lambdalisue/fern.vim/actions?query=workflow%3Areviewdog)
-[![vim](https://github.com/lambdalisue/fern.vim/workflows/vim/badge.svg)](https://github.com/lambdalisue/fern.vim/actions?query=workflow%3Avim)
-[![neovim](https://github.com/lambdalisue/fern.vim/workflows/neovim/badge.svg)](https://github.com/lambdalisue/fern.vim/actions?query=workflow%3Aneovim)
+[![reviewdog](https://github.com/lambdalisue/fern-git-status.vim/workflows/reviewdog/badge.svg)](https://github.com/lambdalisue/fern-git-status.vim/actions?query=workflow%3Areviewdog)
+[![vim](https://github.com/lambdalisue/fern-git-status.vim/workflows/vim/badge.svg)](https://github.com/lambdalisue/fern-git-status.vim/actions?query=workflow%3Avim)
+[![neovim](https://github.com/lambdalisue/fern-git-status.vim/workflows/neovim/badge.svg)](https://github.com/lambdalisue/fern-git-status.vim/actions?query=workflow%3Aneovim)
 
 Add Git status badge on [fern.vim][].
 
