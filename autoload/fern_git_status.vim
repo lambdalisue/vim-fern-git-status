@@ -1,117 +1,96 @@
-let s:Process = vital#fern#import('Async.Promise.Process')
-let s:Promise = vital#fern#import('Async.Promise')
-let s:Lambda = vital#fern#import('Lambda')
-let s:AsyncLambda = vital#fern#import('Async.Lambda')
 let s:CancellationToken = vital#fern#import('Async.CancellationToken')
-let s:CancellationTokenSource = vital#fern#import('Async.CancellationTokenSource')
+let s:PROCESSING_VARNAME = 'fern_git_status_processing'
 
-let s:PATTERN = '^$~.*[]\'
-let s:processing = 0
-
-
-function! fern_git_status#on_redraw(helper) abort
-  if a:helper.fern.scheme !=# 'file' || s:processing
+function! fern_git_status#init() abort
+  if exists('s:ready')
     return
   endif
+  let s:ready = 1
+  call fern#hook#add('viewer:highlight', function('s:on_highlight'))
+  call fern#hook#add('viewer:syntax', function('s:on_syntax'))
+  call fern#hook#add('viewer:redraw', function('s:on_redraw'))
+endfunction
 
-  if exists('s:source')
-    call s:source.cancel()
+function! s:on_highlight(...) abort
+  highlight default link FernBadge   Comment
+  highlight default link FernGitStatusIndex Special
+  highlight default link FernGitStatusWorktree WarningMsg
+  highlight default link FernGitStatusUnmerged ErrorMsg
+  highlight default link FernGitStatusUntracked Comment
+  highlight default link FernGitStatusIgnored Comment
+endfunction
+
+function! s:on_syntax(...) abort
+  syntax match FernGitStatus /\[\zs..\ze\]/ contained containedin=FernBadge
+
+  syntax match FernGitStatusIndex     /./ contained containedin=FernGitStatus nextgroup=FernGitStatusWorktree
+  syntax match FernGitStatusWorktree  /./  contained
+
+  syntax match FernGitStatusUnmerged  /DD\|AU\|UD\|UA\|DU\|AA\|UU/ contained containedin=FernGitStatus
+
+  syntax match FernGitStatusUntracked /??/ contained containedin=FernGitStatus
+  syntax match FernGitStatusIgnored   /!!/ contained containedin=FernGitStatus
+endfunction
+
+function! s:on_redraw(helper) abort
+  let bufnr = a:helper.bufnr
+  let processing = getbufvar(bufnr, s:PROCESSING_VARNAME, 0)
+  if a:helper.fern.scheme !=# 'file' || processing
+    return
   endif
-  let s:source = s:CancellationTokenSource.new()
-
-  call s:read(a:helper.fern.root._path, s:source.token)
-        \.then({ m -> s:update_nodes(a:helper, m) })
+  let options = {
+        \ 'include_ignores': !g:fern_git_status#disable_ignores,
+        \ 'include_untracked': !g:fern_git_status#disable_untracked,
+        \ 'include_submodules': !g:fern_git_status#disable_submodules,
+        \ 'include_directories': !g:fern_git_status#disable_directories,
+        \ 'indexed_character': g:fern_git_status#indexed_character,
+        \ 'stained_character': g:fern_git_status#stained_character,
+        \ 'indexed_patterns': g:fern_git_status#indexed_patterns,
+        \ 'stained_patterns': g:fern_git_status#stained_patterns,
+        \}
+  call fern_git_status#investigator#investigate(a:helper, options)
+        \.then({ m -> map(a:helper.fern.visible_nodes, { -> s:update_node(m, v:val) }) })
         \.then({ -> s:redraw(a:helper) })
-        \.catch({ e -> timer_start(0, { -> s:echoerr(e) }) })
-endfunction
-
-function! fern_git_status#on_highlight(...) abort
-  highlight default link FernGitStained   WarningMsg
-  highlight default link FernGitCleaned   Special
-  highlight default link FernGitStaged    Special
-  highlight default link FernGitRenamed   Title
-  highlight default link FernGitDeleted   Title
-  highlight default link FernGitModified  WarningMsg
-  highlight default link FernGitUnmerged  WarningMsg
-  highlight default link FernGitUntracked Comment
-  highlight default link FernGitIgnored   Comment
-  highlight default link FernGitUnknown   Comment
-endfunction
-
-function! fern_git_status#on_syntax(...) abort
-  for [k, v] in items(g:fern_git_status#badge_map)
-    if !empty(v)
-      execute printf(
-            \ 'syntax match FernGit%s /%s/ contained containedin=FernBadge',
-            \ k, escape(v, s:PATTERN),
-            \)
-    endif
-  endfor
-endfunction
-
-function! s:read(root, token) abort
-  let t = s:Process.start(
-        \ ['git', '-C', a:root, 'rev-parse', '--show-toplevel'],
-        \ { 'token': a:token },
-        \)
-        \.then({ v -> v.exitval ? s:Promise.reject(join(v.stderr, "\n")) : v.stdout })
-        \.then({ v -> join(v, '') })
-  let args = [
-        \ g:fern_git_status#disable_untracked ? '' : '-uall',
-        \ g:fern_git_status#disable_ignored ? '' : '--ignored',
-        \]
-  let s = s:Process.start(
-        \ ['git', '-C', a:root, 'status', '--porcelain'] + filter(args, { -> !empty(v:val) }),
-        \ { 'token': a:token },
-        \)
-        \.then({ v -> v.exitval ? s:Promise.reject(join(v.stderr, "\n")) : v.stdout })
-  return s:Promise.all([t, s])
-        \.then({ v -> v + [!g:fern_git_status#disable_stained] })
-        \.then({ v -> call('fern_git_status#parser#parse', v) })
-endfunction
-
-function! s:update_nodes(helper, status_map) abort
-  return s:Promise.resolve(a:helper.fern.nodes)
-        \.then(s:AsyncLambda.map_f({ n -> s:update_node(a:status_map, n) }))
+        \.catch({ e -> s:handle_error(e) })
 endfunction
 
 function! s:update_node(status_map, node) abort
-  let s = get(a:status_map, a:node._path, '')
-  let a:node.badge = get(g:fern_git_status#badge_map, s, '')
+  let status = get(a:status_map, a:node._path, '')
+  let a:node.badge = status ==# '' ? '' : printf(' [%s]', status)
   return a:node
 endfunction
 
 function! s:redraw(helper) abort
-  let s:processing = 1
+  let bufnr = a:helper.bufnr
+  call setbufvar(bufnr, s:PROCESSING_VARNAME, 1)
   return a:helper.async.redraw()
-        \.then({ -> s:Lambda.let(s:, 'processing', 0)})
+        \.then({ -> setbufvar(bufnr, s:PROCESSING_VARNAME, 0)})
 endfunction
 
-function! s:echoerr(error) abort
-  if a:error ==# s:CancellationToken.CancelledError
-    return
-  elseif a:error =~# '^fatal: not a git repository'
-    return
+function! s:handle_error(err) abort
+  if type(a:err) is# v:t_string
+    if a:err ==# s:CancellationToken.CancelledError
+      return
+    elseif a:err =~# '^fatal: not a git repository'
+      return
+    endif
   endif
-  echohl ErrorMsg
-  for line in split(a:error, '\n')
-    echomsg printf('[fern-git-status] %s', line)
-  endfor
-  echohl None
+  call fern#logger#error(a:err)
 endfunction
 
+let g:fern_git_status#disable_ignores = get(g:, 'fern_git_status#disable_ignores', 0)
 let g:fern_git_status#disable_untracked = get(g:, 'fern_git_status#disable_untracked', 0)
-let g:fern_git_status#disable_ignored = get(g:, 'fern_git_status#disable_ignored', 0)
-let g:fern_git_status#disable_stained = get(g:, 'fern_git_status#disable_stained', 0)
-let g:fern_git_status#badge_map = get(g:, 'fern_git_status#badge_map', {
-      \ 'Stained': '"',
-      \ 'Cleaned': "'",
-      \ 'Staged': '+',
-      \ 'Renamed': 'r',
-      \ 'Deleted': 'x',
-      \ 'Modified': '*',
-      \ 'Unmerged': 'u',
-      \ 'Untracked': '?',
-      \ 'Ignored': '!',
-      \ 'Unknown': 'U',
-      \})
+let g:fern_git_status#disable_submodules = get(g:, 'fern_git_status#disable_submodules', 0)
+let g:fern_git_status#disable_directories = get(g:, 'fern_git_status#disable_directories', 0)
+let g:fern_git_status#indexed_character = get(g:, 'fern_git_status#indexed_character', '-')
+let g:fern_git_status#stained_character = get(g:, 'fern_git_status#stained_character', '-')
+let g:fern_git_status#indexed_patterns = get(g:, 'fern_git_status#indexed_patterns', [
+      \ '[MARC][ MD]',
+      \ 'D[ RC]',
+      \])
+let g:fern_git_status#stained_patterns = get(g:, 'fern_git_status#stained_patterns', [
+      \ '[ MARC][MD]',
+      \ '[ D][RC]',
+      \ 'DD\|AU\|UD\|UA\|DU\|AA\|UU',
+      \ '??',
+      \])

@@ -3,13 +3,9 @@ if exists('g:loaded_fern_git_status')
 endif
 let g:loaded_fern_git_status = 1
 
-function! s:init() abort
-  call fern#hook#add('renderer:highlight', function('fern_git_status#on_highlight'))
-  call fern#hook#add('renderer:syntax', function('fern_git_status#on_syntax'))
-  call fern#hook#add('viewer:redraw', function('fern_git_status#on_redraw'))
-endfunction
-
-augroup fern-git-status-internal
-  autocmd!
-  autocmd VimEnter * call s:init()
-augroup END
+if !get(g:, 'fern_git_status_disable_startup')
+  augroup fern-git-status-internal
+    autocmd!
+    autocmd VimEnter * ++once call fern_git_status#init()
+  augroup END
+endif

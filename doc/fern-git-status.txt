@@ -14,103 +14,98 @@ INTRODUCTION				*fern-git-status-introduction*
 
 *fern-git-status.vim* is a |fern.vim| plugin which add Git status badge.
 
+Note that the status check will be performed asynchronously every after user
+changes the tree status (e.g. expand a branch node).
+
 
 =============================================================================
 USAGE					*fern-git-status-usage*
 
-Move on to a git repository which has some dirty status then you will see
-badges on each filenames like:
+The plugin automatically starts thus move on to a git repository which has
+some dirty status then you will see badges on each nodes like:
 >
-	fern-git-status.vim 
-	|- autoload 
- 	|- fern_git_status 
-  	|  parser.vim 
- 	|  fern_git_status.vim 
-	|- doc "
- 	|  fern-git-status.txt ?
-	|+ plugin 
-	|- test 
- 	|+ fern_git_status 
-	|  LICENSE ?
-	|  README.md *
+	fern-git-status.vim
+	|+ .git
+	|+ .github
+	|- autoload [--]
+	 |- fern_git_status [--]
+	  |  .DS_Store [!!]
+	  |  investigator.vim [A ]
+	  |  process.vim [??]
+	 |  .DS_Store [!!]
+	 |  fern_git_status.vim [MM]
+	|+ doc
+	|- plugin [- ]
+	 |  fern_git_status.vim [M ]
+	|+ test
+	|  .DS_Store [!!]
+	|  LICENSE
+	|  README.md
 <
-In default, each badge symbols mean:
+See fern-mapping-git.vim[1] if you need some mappings to manage git status or
+see gina.vim[2] if you need a full featured git integration plugin.
 
-	Symbol		Description~
-	"		Stained directory (a directory which contains changes)
-	+		Staged file
-	r		Renamed file
-	x		Deleted file
-	*		Modified file
-	u		Unmerged file
-	?		Untracked file
-	!		Ignored file
-	U		Unknown status file
-
-Users can customize symbols by |g:fern_git_status#badge_map|.
-
-
-=============================================================================
-STATUS					*fern-git-status-status*
-
-"Cleaned"	A directory status which indicate that the directory contains
-		only staged files
-
-"Stained"	A directory status which indicate that the directory contains
-		modified files (Ignored/Unknown is not assumed.)
-
-"Staged"	A file which changes has staged on the index.
-
-"Renamed"	A file which has renamed on the index
-
-"Deleted"	A file which has deleted on the index
-
-"Modified"	A file which has non staged changes
-
-"Unmerged"	A file which has in conflicted status
-
-"Untracked"	A file which has not tracked
-
-"Ignored"	A file which has ignored
-
-"Unknown"	A file which has unknown status (non supported status)
+[1] https://github.com/lambdalisue/fern-mapping-git.vim
+[2] https://github.com/lambdalisue/gina.vim
 
 
 =============================================================================
 INTERFACE				*fern-git-status-interface*
 
 -----------------------------------------------------------------------------
+FUNCTION				*fern-git-status-function*
+
+					*fern_git_status#init()*
+fern_git_status#init()
+	Register hooks to enable this plugin. Users do not need to call it
+	manually unless |g:fern_git_status_disable_startup| has used.
+
+-----------------------------------------------------------------------------
 VARIABLE				*fern-git-status-variable*
 
-*g:fern_git_status#badge_map*
-	A |Dictionary| which key is a |fern-git-status-status| and value is a
-	glyph |String|.
-	Default: See below
->
-	let g:fern_git_status#badge_map = {
-	      \ 'Cleaned': "'",
-	      \ 'Stained': '"',
-	      \ 'Staged': '+',
-	      \ 'Renamed': 'r',
-	      \ 'Deleted': 'x',
-	      \ 'Modified': '*',
-	      \ 'Unmerged': 'u',
-	      \ 'Untracked': '?',
-	      \ 'Ignored': '!',
-	      \ 'Unknown': 'U',
-	      \}
-<
-*g:fern_git_status#disable_untracked*
-	Set 1 to disable showing untracked file status.
-	Default: 0
+*g:fern_git_status_disable_startup*
+	Set 1 to disable startup initialization. User MUST call
+	|fern_git_status#init()| function manually in that case.
 
 *g:fern_git_status#disable_ignored*
-	Set 1 to disable showing ignored file status.
+	Set 1 to disable showing ignored file status. It might improve the
+	performance of rendering.
 	Default: 0
 
-*g:fern_git_status#disable_stained*
-	Set 1 to disable showing stained directory status.
+*g:fern_git_status#disable_untracked*
+	Set 1 to disable showing untracked file status. It might improve the
+	performance of rendering.
 	Default: 0
+
+*g:fern_git_status#disable_submodules*
+	Set 1 to disable showing submodule status. It might improve the
+	performance of rendering.
+	Default: 0
+
+*g:fern_git_status#disable_directories*
+	Set 1 to disable showing directory status. It might improve the
+	performance of rendering.
+	Default: 0
+
+*g:fern_git_status#indexed_character*
+	A |String| used to indicate that the directory contains indexed
+	(staged) changes.
+	Default: "-"
+
+*g:fern_git_status#stained_character*
+	A |String| used to indicate that the directory contains stained
+	(unstaged) changes.
+	Default: "-"
+
+*g:fern_git_status#indexed_patterns*
+	A |List| of |pattern| to determine if the directory has indexed
+	changes. Do NOT change it unless you understand the internal
+	mechanisms to determine the status.
+
+*g:fern_git_status#stained_patterns*
+	A |List| of |pattern| to determine if the directory has stained
+	changes. Do NOT change it unless you understand the internal
+	mechanisms to determine the status.
 
 
 =============================================================================
