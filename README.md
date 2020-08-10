@@ -11,8 +11,51 @@
 [![vim](https://github.com/lambdalisue/fern-git-status.vim/workflows/vim/badge.svg)](https://github.com/lambdalisue/fern-git-status.vim/actions?query=workflow%3Avim)
 [![neovim](https://github.com/lambdalisue/fern-git-status.vim/workflows/neovim/badge.svg)](https://github.com/lambdalisue/fern-git-status.vim/actions?query=workflow%3Aneovim)
 
-Add Git status badge on [fern.vim][].
+fern-git-status is a [fern.vim][] plugin to add git status on node's badge asynchronously like:
 
-**UNDER DEVELOPMENT**
+![fern-git-status](https://user-images.githubusercontent.com/546312/89777703-2483cd80-db47-11ea-84dc-7690d2996d89.png)
 
 [fern.vim]: https://github.com/lambdalisue/fern.vim
+
+## Usage
+
+Just install the plugin and visit a git repository which has some dirty status.
+
+## Status
+
+The plugin shows status of nodes as [short format of git status](https://git-scm.com/docs/git-status#_short_format) like:
+
+```
+X          Y     Meaning
+-------------------------------------------------
+         [AMD]   not updated
+M        [ MD]   updated in index
+A        [ MD]   added to index
+D                deleted from index
+R        [ MD]   renamed in index
+C        [ MD]   copied in index
+[MARC]           index and work tree matches
+[ MARC]     M    work tree changed since index
+[ MARC]     D    deleted in work tree
+[ D]        R    renamed in work tree
+[ D]        C    copied in work tree
+-------------------------------------------------
+D           D    unmerged, both deleted
+A           U    unmerged, added by us
+U           D    unmerged, deleted by them
+U           A    unmerged, added by them
+D           U    unmerged, deleted by us
+A           A    unmerged, both added
+U           U    unmerged, both modified
+-------------------------------------------------
+?           ?    untracked
+!           !    ignored
+-------------------------------------------------
+```
+
+The status of directory indicates that the directory contains index (left) or work tree (right) changes.
+For example, single `-` on right side means that the directory contains some work tree changes but index changes.
+
+## Colors
+
+See `:help fern-git-status-highlight` to customize the colors.
