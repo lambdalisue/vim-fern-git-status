@@ -12,7 +12,7 @@ function! fern_git_status#init() abort
 endfunction
 
 function! s:on_highlight(...) abort
-  highlight default link FernBadge   Comment
+  highlight default link FernGitStatusBracket Comment
   highlight default link FernGitStatusIndex Special
   highlight default link FernGitStatusWorktree WarningMsg
   highlight default link FernGitStatusUnmerged ErrorMsg
@@ -21,10 +21,10 @@ function! s:on_highlight(...) abort
 endfunction
 
 function! s:on_syntax(...) abort
-  syntax match FernGitStatus /\[\zs..\ze\]/ contained containedin=FernBadge
-
+  syntax match FernGitStatusBracket /.*/ contained containedin=FernBadge
+  syntax match FernGitStatus /\[\zs..\ze\]/ contained containedin=FernGitStatusBracket
   syntax match FernGitStatusIndex     /./ contained containedin=FernGitStatus nextgroup=FernGitStatusWorktree
-  syntax match FernGitStatusWorktree  /./  contained
+  syntax match FernGitStatusWorktree  /./ contained
 
   syntax match FernGitStatusUnmerged  /DD\|AU\|UD\|UA\|DU\|AA\|UU/ contained containedin=FernGitStatus
 
