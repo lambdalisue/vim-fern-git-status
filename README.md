@@ -57,3 +57,7 @@ For example, single `-` on right side means that the directory contains some wor
 ## Colors
 
 See `:help fern-git-status-highlight` to customize the colors.
+
+## See also
+
+- [fern-mapping-git.vim](https://github.com/lambdalisue/fern-mapping-git.vim) - Add git related mappings
