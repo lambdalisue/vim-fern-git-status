@@ -55,5 +55,6 @@ endfunction
 function! s:parse_status(record) abort
   let status = a:record[:1]
   let relpath = split(a:record[3:], ' -> ')[-1]
+  let relpath = relpath[-1:] ==# '/' ? relpath[:-2] : relpath
   return [relpath, status]
 endfunction
