@@ -25,8 +25,8 @@ function! fern_git_status#process#status(root, token, options) abort
         \)
   let args = [
         \ 'git', '-C', a:root, 'status', '--porcelain',
-        \ options.include_ignores ? '--ignored' : '',
-        \ options.include_untracked ? '-uall' : '',
+        \ options.include_ignores ? '--ignored=matching' : '--ignored=no',
+        \ options.include_untracked ? '-uall' : '-uno',
         \ options.include_submodules
         \   ? '--ignore-submodules=none'
         \   : '--ignore-submodules=all',
