@@ -18,21 +18,26 @@ endfunction
 function! fern_git_status#process#status(root, token, options) abort
   let options = extend({
         \ 'paths': [],
-        \ 'include_ignores': 0,
+        \ 'include_ignored': 0,
         \ 'include_untracked': 0,
         \ 'include_submodules': 0,
         \}, a:options,
         \)
   let args = [
         \ 'git', '-C', a:root, 'status', '--porcelain',
-        \ options.include_ignores ? '--ignored' : '',
-        \ options.include_untracked ? '-uall' : '',
+        \ options.include_ignored
+        \   ? options.include_untracked
+        \     ? '--ignored=matching'
+        \     : '--ignored=traditional'
+        \   : '--ignored=no',
+        \ options.include_untracked ? '-uall' : '-uno',
         \ options.include_submodules
         \   ? '--ignore-submodules=none'
         \   : '--ignore-submodules=all',
         \]
   let args = args + ['--'] + options.paths
   let args = filter(args, '!empty(v:val)')
+
   let Profile = fern#profile#start('fern_git_status#process#status')
   return s:Process.start(args, {
         \ 'toekn': a:token,
@@ -55,5 +60,6 @@ endfunction
 function! s:parse_status(record) abort
   let status = a:record[:1]
   let relpath = split(a:record[3:], ' -> ')[-1]
+  let relpath = relpath[-1:] ==# '/' ? relpath[:-2] : relpath
   return [relpath, status]
 endfunction

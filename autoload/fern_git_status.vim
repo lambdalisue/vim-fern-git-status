@@ -39,7 +39,7 @@ function! s:on_redraw(helper) abort
     return
   endif
   let options = {
-        \ 'include_ignores': !g:fern_git_status#disable_ignores,
+        \ 'include_ignored': !g:fern_git_status#disable_ignored,
         \ 'include_untracked': !g:fern_git_status#disable_untracked,
         \ 'include_submodules': !g:fern_git_status#disable_submodules,
         \ 'include_directories': !g:fern_git_status#disable_directories,
@@ -78,7 +78,7 @@ function! s:handle_error(err) abort
   call fern#logger#error(a:err)
 endfunction
 
-let g:fern_git_status#disable_ignores = get(g:, 'fern_git_status#disable_ignores', 0)
+let g:fern_git_status#disable_ignored = get(g:, 'fern_git_status#disable_ignored', 0)
 let g:fern_git_status#disable_untracked = get(g:, 'fern_git_status#disable_untracked', 0)
 let g:fern_git_status#disable_submodules = get(g:, 'fern_git_status#disable_submodules', 0)
 let g:fern_git_status#disable_directories = get(g:, 'fern_git_status#disable_directories', 0)
