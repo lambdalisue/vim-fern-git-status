@@ -64,7 +64,7 @@ Disable one by one if you face a performance issue.
 
 ```vim
 " Disable listing ignored files/directories
-let g:fern_git_status#disable_ignores = 1
+let g:fern_git_status#disable_ignored = 1
 
 " Disable listing untracked files
 let g:fern_git_status#disable_untracked = 1

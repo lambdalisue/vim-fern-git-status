@@ -107,7 +107,7 @@ VARIABLE				*fern-git-status-variable*
 	Set 1 to disable startup initialization. User MUST call
 	|fern_git_status#init()| function manually in that case.
 
-*g:fern_git_status#disable_ignores*
+*g:fern_git_status#disable_ignored*
 	Set 1 to disable showing ignored file status. It might improve the
 	performance of rendering.
 	Default: 0

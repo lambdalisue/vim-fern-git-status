@@ -39,7 +39,7 @@ endfunction
 
 function! s:get_status(helper, options) abort
   let options = extend({
-        \ 'include_ignores': 0,
+        \ 'include_ignored': 0,
         \ 'include_untracked': 0,
         \ 'include_submodules': 0,
         \}, a:options,
@@ -56,7 +56,7 @@ function! s:get_status(helper, options) abort
   let token = source.token
   return fern_git_status#process#status(root, token, {
         \ 'paths': paths,
-        \ 'include_ignores': options.include_ignores,
+        \ 'include_ignored': options.include_ignored,
         \ 'include_untracked': options.include_untracked,
         \ 'include_submodules': options.include_submodules,
         \})
