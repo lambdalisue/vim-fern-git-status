@@ -60,7 +60,7 @@ See `:help fern-git-status-highlight` to customize the colors.
 
 ## Performance
 
-Disable one by one if you face a performance issue.
+Disable the following options one by one if you encounter performance issues.
 
 ```vim
 " Disable listing ignored files/directories
@@ -74,6 +74,15 @@ let g:fern_git_status#disable_submodules = 1
 
 " Disable listing status of directories
 let g:fern_git_status#disable_directories = 1
+```
+
+:rocket: For large repositories it is also recommended to enable the Git (2.24+)
+[manyFiles
+feature](https://git-scm.com/docs/git-config#Documentation/git-config.txt-featuremanyFiles)
+in the working directory as follows:
+
+```sh
+git config feature.manyFiles true
 ```
 
 ## See also
