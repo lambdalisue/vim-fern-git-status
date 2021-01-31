@@ -49,6 +49,7 @@ function! s:on_redraw(helper) abort
         \ 'stained_patterns': g:fern_git_status#stained_patterns,
         \}
   call fern_git_status#investigator#investigate(a:helper, options)
+        \.then({ m -> fern#logger#tap(m) })
         \.then({ m -> map(a:helper.fern.visible_nodes, { -> s:update_node(m, v:val) }) })
         \.then({ -> s:redraw(a:helper) })
         \.catch({ e -> s:handle_error(e) })
