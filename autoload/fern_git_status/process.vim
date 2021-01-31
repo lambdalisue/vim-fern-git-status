@@ -12,7 +12,7 @@ function! fern_git_status#process#show_toplevel(root, token) abort
         \})
         \.catch({e -> s:Promise.reject(s:normalize_error(e)) })
         \.then({v -> join(v.stdout, '') })
-        \.then({v -> s:normalize_path(v) })
+        \.then({v -> s:normalize_path(v, a:token) })
         \.finally({ -> Profile() })
 endfunction
 
@@ -47,7 +47,7 @@ function! fern_git_status#process#status(root, token, options) abort
         \.catch({e -> s:Promise.reject(s:normalize_error(e)) })
         \.then({ v -> v.stdout })
         \.then(s:AsyncLambda.filter_f({ v -> v !=# '' }))
-        \.then(s:AsyncLambda.map_f({ v -> s:parse_status(v) }))
+        \.then(s:AsyncLambda.map_f({ v -> s:parse_status(v, a:token) }))
         \.then({ v -> s:Promise.all(v) })
         \.finally({ -> Profile() })
 endfunction
@@ -59,11 +59,11 @@ function! s:normalize_error(error) abort
   return a:error
 endfunction
 
-function! s:parse_status(record) abort
+function! s:parse_status(record, token) abort
   let status = a:record[:1]
   let relpath = split(a:record[3:], ' -> ')[-1]
   let relpath = relpath[-1:] ==# '/' ? relpath[:-2] : relpath
-  return s:normalize_path(relpath)
+  return s:normalize_path(relpath, a:token)
         \.then({ v -> [v, status] })
 endfunction
 
@@ -72,7 +72,7 @@ endfunction
 " not compatible with fern's slash separated path so normalization
 " is required
 if has('win32')
-  function! s:normalize_path(path) abort
+  function! s:normalize_path(path, token) abort
     if a:path[:0] ==# '/' && executable('cygpath')
       " msys2
       return s:Process.start(['cygpath', '-w', a:path], {
@@ -88,7 +88,7 @@ if has('win32')
     endif
   endfunction
 else
-  function! s:normalize_path(path) abort
+  function! s:normalize_path(path, token) abort
     return s:Promise.resolve(a:path)
   endfunction
 endif
