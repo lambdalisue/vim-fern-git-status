@@ -49,13 +49,15 @@ function! s:on_redraw(helper) abort
         \ 'stained_patterns': g:fern_git_status#stained_patterns,
         \}
   call fern_git_status#investigator#investigate(a:helper, options)
+        \.then({ m -> fern#logger#tap(m) })
         \.then({ m -> map(a:helper.fern.visible_nodes, { -> s:update_node(m, v:val) }) })
         \.then({ -> s:redraw(a:helper) })
         \.catch({ e -> s:handle_error(e) })
 endfunction
 
 function! s:update_node(status_map, node) abort
-  let status = get(a:status_map, a:node._path, '')
+  let path = fern#internal#filepath#to_slash(a:node._path)
+  let status = get(a:status_map, path, '')
   let a:node.badge = status ==# '' ? '' : printf(' [%s]', status)
   return a:node
 endfunction
