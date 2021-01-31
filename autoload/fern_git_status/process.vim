@@ -7,7 +7,7 @@ function! fern_git_status#process#show_toplevel(root, token) abort
   let args = ['git', '-C', a:root, 'rev-parse', '--show-toplevel']
   let Profile = fern#profile#start('fern_git_status#process#show_toplevel')
   return s:Process.start(args, {
-        \ 'toekn': a:token,
+        \ 'token': a:token,
         \ 'reject_on_failure': v:true,
         \})
         \.catch({e -> s:Promise.reject(s:normalize_error(e)) })
