@@ -48,6 +48,7 @@ function! fern_git_status#process#status(root, token, options) abort
         \.then({ v -> v.stdout })
         \.then(s:AsyncLambda.filter_f({ v -> v !=# '' }))
         \.then(s:AsyncLambda.map_f({ v -> s:parse_status(v) }))
+        \.then({ v -> s:Promise.all(v) })
         \.finally({ -> Profile() })
 endfunction
 
@@ -62,8 +63,8 @@ function! s:parse_status(record) abort
   let status = a:record[:1]
   let relpath = split(a:record[3:], ' -> ')[-1]
   let relpath = relpath[-1:] ==# '/' ? relpath[:-2] : relpath
-  let relpath = s:normalize_path(relpath)
-  return [relpath, status]
+  return s:normalize_path(relpath)
+        \.then({ v -> [v, status] })
 endfunction
 
 " NOTE:
@@ -72,11 +73,22 @@ endfunction
 " is required
 if has('win32')
   function! s:normalize_path(path) abort
-    let filepath = fern#internal#filepath#from_slash(a:path)
-    return fern#internal#filepath#to_slash(filepath)
+    if a:path[:0] ==# '/' && executable('cygpath')
+      " msys2
+      return s:Process.start(['cygpath', '-w', a:path], {
+            \ 'token': a:token,
+            \ 'reject_on_failure': v:true,
+            \})
+            \.catch({e -> s:Promise.reject(s:normalize_error(e)) })
+    else
+      " Git for Windows
+      let filepath = fern#internal#filepath#from_slash(a:path)
+      let path = fern#internal#filepath#to_slash(filepath)
+      return s:Promise.resolve(path)
+    endif
   endfunction
 else
   function! s:normalize_path(path) abort
-    return a:path
+    return s:Promise.resolve(a:path)
   endfunction
 endif
