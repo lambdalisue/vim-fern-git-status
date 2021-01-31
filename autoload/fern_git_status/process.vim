@@ -12,6 +12,7 @@ function! fern_git_status#process#show_toplevel(root, token) abort
         \})
         \.catch({e -> s:Promise.reject(s:normalize_error(e)) })
         \.then({v -> join(v.stdout, '') })
+        \.then({v -> s:normalize_path(v) })
         \.finally({ -> Profile() })
 endfunction
 
@@ -61,5 +62,21 @@ function! s:parse_status(record) abort
   let status = a:record[:1]
   let relpath = split(a:record[3:], ' -> ')[-1]
   let relpath = relpath[-1:] ==# '/' ? relpath[:-2] : relpath
+  let relpath = s:normalize_path(relpath)
   return [relpath, status]
 endfunction
+
+" NOTE:
+" Git for Windows return slash separated path but the path is
+" not compatible with fern's slash separated path so normalization
+" is required
+if has("win32")
+  function! s:normalize_path(path) abort
+    let filepath = fern#internal#filepath#from_slash(a:path)
+    return fern#internal#filepath#to_slash(filepath)
+  endfunction
+else
+  function! s:normalize_path(path) abort
+    return a:path
+  endfunction
+endif

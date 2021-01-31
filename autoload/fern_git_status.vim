@@ -55,7 +55,8 @@ function! s:on_redraw(helper) abort
 endfunction
 
 function! s:update_node(status_map, node) abort
-  let status = get(a:status_map, a:node._path, '')
+  let path = fern#internal#filepath#to_slash(a:node._path)
+  let status = get(a:status_map, path, '')
   let a:node.badge = status ==# '' ? '' : printf(' [%s]', status)
   return a:node
 endfunction
