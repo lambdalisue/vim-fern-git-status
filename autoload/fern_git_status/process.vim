@@ -70,7 +70,7 @@ endfunction
 " Git for Windows return slash separated path but the path is
 " not compatible with fern's slash separated path so normalization
 " is required
-if has("win32")
+if has('win32')
   function! s:normalize_path(path) abort
     let filepath = fern#internal#filepath#from_slash(a:path)
     return fern#internal#filepath#to_slash(filepath)
