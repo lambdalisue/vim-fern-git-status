@@ -79,6 +79,7 @@ if has('win32')
             \ 'token': a:token,
             \ 'reject_on_failure': v:true,
             \})
+            \.then({v -> join(v.stdout, '') })
             \.catch({e -> s:Promise.reject(s:normalize_error(e)) })
     else
       " Git for Windows
