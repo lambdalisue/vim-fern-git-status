@@ -52,10 +52,9 @@ function! s:get_status(helper, options) abort
   call setbufvar(bufnr, s:GET_STATUS_SOURCE_VARNAME, source)
   " Return a process to get git status
   let root = a:helper.fern.root._path
-  let paths = map(copy(a:helper.fern.visible_nodes), { -> v:val._path })
   let token = source.token
   return fern_git_status#process#status(root, token, {
-        \ 'paths': paths,
+        \ 'paths': ['.'],
         \ 'include_ignored': options.include_ignored,
         \ 'include_untracked': options.include_untracked,
         \ 'include_submodules': options.include_submodules,
